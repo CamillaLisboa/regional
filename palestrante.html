@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Palestrante · 44º Congresso Espírita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/estilo.css">
+</head>
+<body class="palestrante">
+  <header class="topo">
+    <div class="container">
+      <div class="marca"><b>44º Congresso Espírita</b><small>Amor x Preconceito · Perguntas</small></div>
+      <nav>
+        <a href="/perguntar">Perguntar</a>
+        <a href="/moderar">Moderação</a>
+        <a class="ativo" href="/palestrante">Palestrante</a>
+        <a href="/telao" target="_blank">Telão ↗</a>
+      </nav>
+    </div>
+  </header>
+  <div class="linha-ouro"></div>
+
+  <div id="porta" class="container estreito oculto">
+    <form id="form-pin" class="cartao">
+      <h2>Acesso da equipe</h2>
+      <p class="sub">Digite o PIN para continuar.</p>
+      <label for="pin">PIN</label>
+      <input id="pin" type="password" inputmode="numeric" autocomplete="off" required>
+      <button class="primario grande" type="submit">Entrar</button>
+      <div id="erro-pin" class="aviso erro oculto"></div>
+    </form>
+  </div>
+
+  <main id="app" class="container oculto">
+    <h2>Perguntas do público</h2>
+    <p class="sub">Somente perguntas aprovadas pela equipe. Atualiza sozinho.</p>
+    <div id="erro" class="aviso erro oculto"></div>
+    <div id="lista" class="lista"></div>
+
+    <details id="bloco-respondidas" class="oculto" style="margin-top:28px">
+      <summary>Já respondidas (<span id="num-resp">0</span>)</summary>
+      <div id="respondidas" class="lista" style="margin-top:12px"></div>
+    </details>
+  </main>
+
+  <script src="/comum.js"></script>
+  <script>
+    var dados = { perguntas: [], telaoId: '' };
+
+    function carregar() {
+      return chamar('listarPalestrante', PIN).then(function (d) {
+        dados = d;
+        document.getElementById('erro').classList.add('oculto');
+        render();
+      }).catch(mostrarErro);
+    }
+
+    function mostrarErro(e) {
+      var el = document.getElementById('erro');
+      el.textContent = erroMsg(e);
+      el.classList.remove('oculto');
+    }
+
+    function render() {
+      var abertas = dados.perguntas.filter(function (q) { return q.status === 'aprovada'; })
+        .sort(function (a, b) { return a.criadoEm - b.criadoEm; });
+      var feitas = dados.perguntas.filter(function (q) { return q.status === 'respondida'; })
+        .sort(function (a, b) { return b.criadoEm - a.criadoEm; });
+
+      document.getElementById('lista').innerHTML = abertas.length
+        ? abertas.map(cartao).join('')
+        : '<div class="vazio">Nenhuma pergunta aguardando resposta.</div>';
+
+      document.getElementById('bloco-respondidas').classList.toggle('oculto', !feitas.length);
+      document.getElementById('num-resp').textContent = feitas.length;
+      document.getElementById('respondidas').innerHTML = feitas.map(cartao).join('');
+    }
+
+    function cartao(q) {
+      var noAr = q.id === dados.telaoId;
+      var h = '<article class="pergunta st-' + q.status + (noAr ? ' no-ar' : '') + '">';
+      h += '<div class="meta"><strong>' + esc(q.nome || 'Anônimo') + '</strong> · ' + hora(q.criadoEm) +
+        (q.versoes.length ? ' <span class="etiqueta editada">reescrita pela equipe</span>' : '') +
+        (noAr ? ' <span class="etiqueta ar">no telão</span>' : '') + '</div>';
+      h += '<p class="texto">' + esc(q.atual) + '</p>';
+      h += blocoVersoes(q);
+      h += '<div class="acoes">';
+      h += noAr
+        ? '<button class="telao no-ar" data-acao="projetar" data-id="">Tirar do telão</button>'
+        : '<button class="telao" data-acao="projetar" data-id="' + q.id + '">Mostrar no telão</button>';
+      h += q.status === 'aprovada'
+        ? '<button class="ok" data-acao="status" data-status="respondida" data-id="' + q.id + '">Respondida ✓</button>'
+        : '<button data-acao="status" data-status="aprovada" data-id="' + q.id + '">Reabrir</button>';
+      return h + '</div></article>';
+    }
+
+    document.getElementById('app').addEventListener('click', function (ev) {
+      var b = ev.target.closest('button[data-acao]');
+      if (!b) return;
+      var p = b.dataset.acao === 'projetar'
+        ? chamar('projetar', PIN, b.dataset.id)
+        : chamar('definirStatus', PIN, b.dataset.id, b.dataset.status);
+      b.disabled = true;
+      p.then(carregar).catch(function (e) { b.disabled = false; mostrarErro(e); });
+    });
+
+    portaPin(function () { repetir(carregar, 5000); });
+  </script>
+</body>
+</html>

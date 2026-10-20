@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Moderação · 44º Congresso Espírita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/estilo.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="container">
+      <div class="marca"><b>44º Congresso Espírita</b><small>Amor x Preconceito · Perguntas</small></div>
+      <nav>
+        <a href="/perguntar">Perguntar</a>
+        <a class="ativo" href="/moderar">Moderação</a>
+        <a href="/palestrante">Palestrante</a>
+        <a href="/telao" target="_blank">Telão ↗</a>
+      </nav>
+    </div>
+  </header>
+  <div class="linha-ouro"></div>
+
+  <div id="porta" class="container estreito oculto">
+    <form id="form-pin" class="cartao">
+      <h2>Acesso da equipe</h2>
+      <p class="sub">Digite o PIN para continuar.</p>
+      <label for="pin">PIN</label>
+      <input id="pin" type="password" inputmode="numeric" autocomplete="off" required>
+      <button class="primario grande" type="submit">Entrar</button>
+      <div id="erro-pin" class="aviso erro oculto"></div>
+    </form>
+  </div>
+
+  <main id="app" class="container oculto">
+    <h2>Moderação</h2>
+    <p class="sub">Reescreva as perguntas difíceis de entender e aprove as que devem chegar ao palestrante. O original sempre fica guardado.</p>
+    <div id="abas" class="abas"></div>
+    <div id="erro" class="aviso erro oculto"></div>
+    <div id="lista" class="lista"></div>
+  </main>
+
+  <script src="/comum.js"></script>
+  <script>
+    var ABAS = [
+      ['pendente', 'Pendentes'], ['aprovada', 'Aprovadas'], ['respondida', 'Respondidas'],
+      ['rejeitada', 'Rejeitadas'], ['todas', 'Todas'],
+    ];
+    var aba = 'pendente';
+    var dados = { perguntas: [], telaoId: '' };
+    var editando = null; // id da pergunta com o editor aberto
+
+    function carregar() {
+      return chamar('listarModeracao', PIN).then(function (d) {
+        dados = d;
+        document.getElementById('erro').classList.add('oculto');
+        if (!editando) render();
+      }).catch(mostrarErro);
+    }
+
+    function mostrarErro(e) {
+      var el = document.getElementById('erro');
+      el.textContent = erroMsg(e);
+      el.classList.remove('oculto');
+    }
+
+    function render() {
+      var contagem = { todas: dados.perguntas.length };
+      dados.perguntas.forEach(function (q) { contagem[q.status] = (contagem[q.status] || 0) + 1; });
+
+      document.getElementById('abas').innerHTML = ABAS.map(function (a) {
+        return '<button data-aba="' + a[0] + '" class="' + (a[0] === aba ? 'ativa' : '') + '">' +
+          a[1] + '<span class="num">' + (contagem[a[0]] || 0) + '</span></button>';
+      }).join('');
+
+      var lista = dados.perguntas.filter(function (q) { return aba === 'todas' || q.status === aba; });
+      // Pendentes: mais antigas primeiro (ordem de chegada). Demais: mais recentes primeiro.
+      lista.sort(function (a, b) { return aba === 'pendente' ? a.criadoEm - b.criadoEm : b.criadoEm - a.criadoEm; });
+
+      document.getElementById('lista').innerHTML = lista.length
+        ? lista.map(cartao).join('')
+        : '<div class="vazio">Nenhuma pergunta aqui.</div>';
+    }
+
+    function cartao(q) {
+      var noAr = q.id === dados.telaoId;
+      var h = '<article class="pergunta st-' + q.status + (noAr ? ' no-ar' : '') + '">';
+      h += '<div class="meta"><strong>' + esc(q.nome || 'Anônimo') + '</strong> · ' + hora(q.criadoEm) +
+        ' <span class="etiqueta ' + q.status + '">' + q.status + '</span>' +
+        (q.versoes.length ? ' <span class="etiqueta editada">reescrita</span>' : '') +
+        (noAr ? ' <span class="etiqueta ar">no telão</span>' : '') + '</div>';
+      h += '<p class="texto">' + esc(q.atual) + '</p>';
+      h += blocoVersoes(q);
+
+      if (editando === q.id) {
+        h += '<div class="editor"><label for="ed-' + q.id + '">Nova versão</label>' +
+          '<textarea id="ed-' + q.id + '" maxlength="1000">' + esc(q.atual) + '</textarea>' +
+          '<div class="acoes"><button class="primario" data-acao="salvar" data-id="' + q.id + '">Salvar versão</button>' +
+          '<button data-acao="cancelar" data-id="' + q.id + '">Cancelar</button></div></div>';
+      } else {
+        h += '<div class="acoes">';
+        h += '<button data-acao="editar" data-id="' + q.id + '">Reescrever</button>';
+        if (q.status !== 'aprovada') h += '<button class="ok" data-acao="status" data-status="aprovada" data-id="' + q.id + '">' + (q.status === 'respondida' ? 'Reabrir' : 'Aprovar') + '</button>';
+        if (q.status === 'aprovada') h += '<button data-acao="status" data-status="respondida" data-id="' + q.id + '">Marcar respondida</button>';
+        if (q.status !== 'pendente') h += '<button data-acao="status" data-status="pendente" data-id="' + q.id + '">Voltar p/ pendente</button>';
+        if (q.status !== 'rejeitada') h += '<button class="perigo" data-acao="status" data-status="rejeitada" data-id="' + q.id + '">Rejeitar</button>';
+        if (q.status === 'aprovada' || q.status === 'respondida') {
+          h += noAr
+            ? '<button class="telao no-ar" data-acao="projetar" data-id="">Tirar do telão</button>'
+            : '<button class="telao" data-acao="projetar" data-id="' + q.id + '">Mostrar no telão</button>';
+        }
+        h += '</div>';
+      }
+      return h + '</article>';
+    }
+
+    document.getElementById('abas').addEventListener('click', function (ev) {
+      var b = ev.target.closest('button[data-aba]');
+      if (!b) return;
+      aba = b.dataset.aba;
+      editando = null;
+      render();
+    });
+
+    document.getElementById('lista').addEventListener('click', function (ev) {
+      var b = ev.target.closest('button[data-acao]');
+      if (!b) return;
+      var id = b.dataset.id;
+      var acao = b.dataset.acao;
+
+      if (acao === 'editar') {
+        editando = id; render();
+        var t = document.getElementById('ed-' + id);
+        t.focus(); t.setSelectionRange(t.value.length, t.value.length);
+        return;
+      }
+      if (acao === 'cancelar') { editando = null; render(); return; }
+
+      var p;
+      if (acao === 'salvar') p = chamar('reescrever', PIN, id, document.getElementById('ed-' + id).value);
+      if (acao === 'status') p = chamar('definirStatus', PIN, id, b.dataset.status);
+      if (acao === 'projetar') p = chamar('projetar', PIN, id);
+      if (!p) return;
+
+      b.disabled = true;
+      p.then(function () { editando = null; return carregar(); })
+        .catch(function (e) { b.disabled = false; mostrarErro(e); });
+    });
+
+    portaPin(function () { repetir(carregar, 5000); });
+  </script>
+</body>
+</html>

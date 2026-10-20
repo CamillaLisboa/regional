@@ -1,0 +1,181 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Identidade do 44º Congresso Espírita da Região de Marília */
+    --navy: #0b1a3d;
+    --navy-2: #142a5c;
+    --navy-3: #1f3a78;
+    --ouro: #d4a94f;
+    --ouro-claro: #f0d48c;
+    --ouro-escuro: #a97e2a;
+    --creme: #f6f1e6;
+
+    --fundo: #f4efe4;
+    --cartao: #ffffff;
+    --texto: #16213d;
+    --suave: #626b80;
+    --borda: #e4dccb;
+    --ok: #17805d;
+    --perigo: #b8352e;
+    --aviso: #9a6400;
+    --raio: 14px;
+    --titulo: "Montserrat", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--fundo);
+    color: var(--texto);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 28px 16px 64px; }
+  .estreito { max-width: 540px; }
+
+  /* ---------- Faixa dourada / tema ---------- */
+  .linha-ouro { height: 3px; background: linear-gradient(90deg, transparent, var(--ouro) 20%, var(--ouro-claro) 50%, var(--ouro) 80%, transparent); }
+  .tema {
+    display: inline-block;
+    font-family: var(--titulo); font-weight: 800; color: var(--navy);
+    text-transform: uppercase; letter-spacing: .02em; line-height: 1.05;
+    padding: .35em .9em;
+    background: linear-gradient(100deg, #e6c477 0%, #f6e3ad 40%, #e2bd69 75%, #c99a3f 100%);
+    clip-path: polygon(2% 8%, 12% 0, 40% 4%, 70% 0, 97% 6%, 100% 40%, 98% 92%, 70% 100%, 35% 96%, 6% 100%, 0 70%, 1% 30%);
+    transform: rotate(-1.2deg);
+  }
+  .data {
+    display: inline-block; font-family: var(--titulo); font-weight: 700; font-size: 14px;
+    color: var(--navy); background: var(--ouro-claro); border-radius: 8px; padding: 6px 14px;
+  }
+
+  /* ---------- Capa do público ---------- */
+  body.publico {
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(80,120,220,.35), transparent 70%),
+      radial-gradient(ellipse 60% 40% at 100% 100%, rgba(212,169,79,.12), transparent 70%),
+      linear-gradient(180deg, var(--navy-2), var(--navy) 60%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  .capa { text-align: center; color: #fff; padding: 36px 16px 8px; }
+  .capa .divisor { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 22px; }
+  .capa .divisor span { width: 70px; height: 2px; background: var(--ouro); }
+  .capa .divisor i { width: 2px; height: 20px; background: var(--ouro); }
+  .capa .edicao { font-family: var(--titulo); font-weight: 700; font-size: clamp(24px, 7vw, 34px); line-height: 1; margin: 0; }
+  .capa .espirita { font-family: var(--titulo); font-weight: 800; font-size: clamp(42px, 13vw, 64px); line-height: 1; margin: 4px 0 6px; letter-spacing: .01em; }
+  .capa .regiao { font-family: var(--titulo); font-weight: 700; color: var(--ouro); font-size: clamp(14px, 4.2vw, 19px); letter-spacing: .03em; margin: 0 0 16px; }
+  .capa .tema { font-size: clamp(22px, 7vw, 32px); margin-top: 18px; }
+  .capa .expositor { margin-top: 20px; color: #c9d2ea; font-size: 14px; }
+  .capa .expositor strong { display: block; font-family: var(--titulo); color: var(--ouro-claro); font-size: 18px; letter-spacing: .04em; text-transform: uppercase; }
+
+  .publico .cartao { border: 0; border-top: 4px solid var(--ouro); box-shadow: 0 20px 50px rgba(0,0,0,.35); margin-top: 28px; }
+  .publico .cartao h2 { margin-top: 0; }
+  .rodape { text-align: center; color: #93a0c4; font-size: 12px; margin-top: 28px; line-height: 1.6; }
+  .rodape strong { color: var(--ouro); font-weight: 600; }
+
+  /* ---------- Topo das telas da equipe ---------- */
+  header.topo { background: linear-gradient(90deg, var(--navy), var(--navy-2)); color: #fff; }
+  header.topo .container { padding-top: 14px; padding-bottom: 14px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  header.topo .marca { margin-right: auto; line-height: 1.15; }
+  header.topo .marca b { display: block; font-family: var(--titulo); font-weight: 800; font-size: 16px; letter-spacing: .01em; }
+  header.topo .marca small { color: var(--ouro); font-family: var(--titulo); font-weight: 700; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+  header.topo nav { display: flex; gap: 4px; flex-wrap: wrap; }
+  header.topo nav a { color: #c9d2ea; text-decoration: none; padding: 7px 12px; border-radius: 99px; font-size: 13px; font-weight: 600; }
+  header.topo nav a:hover { background: rgba(255,255,255,.08); color: #fff; }
+  header.topo nav a.ativo { background: var(--ouro); color: var(--navy); }
+
+  h2 { font-family: var(--titulo); font-size: 24px; font-weight: 800; margin: 0 0 6px; color: var(--navy); }
+  .sub { color: var(--suave); margin: 0 0 22px; }
+
+  .cartao { background: var(--cartao); border: 1px solid var(--borda); border-radius: var(--raio); padding: 24px; }
+
+  label { display: block; font-weight: 600; font-size: 14px; margin: 18px 0 6px; color: var(--navy); }
+  input[type=text], input[type=password], textarea {
+    width: 100%; font: inherit; color: inherit;
+    padding: 12px 14px; border: 1.5px solid var(--borda); border-radius: 10px; background: #fffdf8;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  input:focus, textarea:focus { outline: none; border-color: var(--ouro); box-shadow: 0 0 0 4px rgba(212,169,79,.22); }
+  input:disabled { background: #f1ede4; color: var(--suave); }
+  textarea { min-height: 130px; resize: vertical; }
+  .check { display: flex; gap: 10px; align-items: center; font-weight: 500; margin-top: 12px; color: var(--texto); cursor: pointer; }
+  .check input { width: 18px; height: 18px; accent-color: var(--navy-3); }
+  .contador { text-align: right; font-size: 12px; color: var(--suave); margin-top: 4px; }
+
+  button {
+    font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+    border: 1.5px solid var(--borda); background: #fff; color: var(--texto);
+    padding: 8px 14px; border-radius: 99px; transition: background .15s, border-color .15s, transform .05s;
+  }
+  button:hover { border-color: var(--navy-3); }
+  button:active { transform: translateY(1px); }
+  button:disabled { opacity: .5; cursor: default; }
+  button.primario { background: var(--navy); border-color: var(--navy); color: #fff; }
+  button.primario:hover { background: var(--navy-3); border-color: var(--navy-3); }
+  button.ok { color: var(--ok); border-color: #b9dfcf; }
+  button.ok:hover { background: #ecf7f2; border-color: var(--ok); }
+  button.perigo { color: var(--perigo); border-color: #ecc7c4; }
+  button.perigo:hover { background: #fbefee; border-color: var(--perigo); }
+  button.telao { background: linear-gradient(100deg, #e6c477, #f3dc9e 50%, #d4a94f); border-color: var(--ouro); color: var(--navy); }
+  button.telao:hover { border-color: var(--ouro-escuro); }
+  button.telao.no-ar { background: var(--perigo); border-color: var(--perigo); color: #fff; }
+  .grande {
+    width: 100%; padding: 14px; font-size: 16px; margin-top: 22px; border-radius: 12px;
+    font-family: var(--titulo); font-weight: 700; letter-spacing: .02em;
+  }
+  .publico .grande { background: linear-gradient(100deg, #e6c477, #f3dc9e 50%, #d4a94f); border: 0; color: var(--navy); }
+  .publico .grande:hover { filter: brightness(1.05); }
+
+  .aviso { padding: 12px 14px; border-radius: 10px; margin-top: 16px; font-size: 14px; }
+  .aviso.sucesso { background: #e7f5ee; color: var(--ok); }
+  .aviso.erro { background: #fbeceb; color: var(--perigo); }
+  .oculto { display: none !important; }
+
+  .abas { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+  .abas button { font-weight: 600; background: transparent; }
+  .abas button.ativa { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .abas .num { display: inline-block; min-width: 20px; margin-left: 6px; padding: 0 6px; border-radius: 99px; background: rgba(0,0,0,.07); font-size: 12px; }
+  .abas button.ativa .num { background: var(--ouro); color: var(--navy); }
+
+  .lista { display: grid; gap: 14px; }
+  .pergunta {
+    background: var(--cartao); border: 1px solid var(--borda); border-left: 4px solid var(--borda);
+    border-radius: var(--raio); padding: 18px 20px; box-shadow: 0 1px 2px rgba(11,26,61,.04);
+  }
+  .pergunta.st-pendente { border-left-color: var(--ouro); }
+  .pergunta.st-aprovada { border-left-color: var(--navy-3); }
+  .pergunta.no-ar { border-color: var(--perigo); border-left-color: var(--perigo); box-shadow: 0 0 0 3px rgba(184,53,46,.12); }
+  .meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--suave); }
+  .meta strong { color: var(--navy); }
+  .texto { font-size: 17px; margin: 10px 0 0; white-space: pre-wrap; word-wrap: break-word; }
+  .palestrante .texto { font-family: var(--titulo); font-weight: 600; font-size: 22px; line-height: 1.4; color: var(--navy); }
+  .etiqueta { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: 3px 9px; border-radius: 99px; background: #eee9dd; }
+  .etiqueta.pendente { background: #fbf0d4; color: var(--aviso); }
+  .etiqueta.aprovada { background: #e3e9f8; color: var(--navy-3); }
+  .etiqueta.rejeitada { background: #fbeceb; color: var(--perigo); }
+  .etiqueta.respondida { background: #e7f5ee; color: var(--ok); }
+  .etiqueta.editada { background: #f6ecd2; color: var(--ouro-escuro); }
+  .etiqueta.ar { background: var(--perigo); color: #fff; }
+
+  details { margin-top: 12px; font-size: 14px; color: var(--suave); }
+  details summary { cursor: pointer; font-weight: 600; color: var(--navy-3); }
+  details .versao { border-left: 3px solid var(--ouro-claro); padding: 2px 0 2px 12px; margin: 10px 0; white-space: pre-wrap; color: var(--texto); }
+  details .versao small { display: block; font-size: 12px; color: var(--suave); }
+
+  .acoes { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .editor { margin-top: 12px; }
+  .editor textarea { min-height: 90px; }
+  .vazio { text-align: center; color: var(--suave); padding: 48px 16px; border: 2px dashed var(--borda); border-radius: var(--raio); }
+
+  #porta .cartao { border-top: 4px solid var(--ouro); margin-top: 24px; }
+
+  @media (max-width: 520px) {
+    .container { padding: 20px 16px 48px; }
+    .cartao { padding: 20px; }
+    .palestrante .texto { font-size: 19px; }
+    header.topo .marca { width: 100%; }
+  }
+</style>

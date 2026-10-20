@@ -1,0 +1,6 @@
+{
+  "name": "congresso-perguntas",
+  "private": true,
+  "description": "Perguntas do público para o 44º Congresso Espírita da Região de Marília",
+  "engines": { "node": ">=18" }
+}

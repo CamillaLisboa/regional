@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Envie sua pergunta · 44º Congresso Espírita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/estilo.css">
+</head>
+<body class="publico">
+  <header class="capa">
+    <div class="divisor"><span></span><i></i><span></span></div>
+    <p class="edicao">44º CONGRESSO</p>
+    <p class="espirita">ESPÍRITA</p>
+    <p class="regiao">DA REGIÃO DE MARÍLIA</p>
+    <span class="data">08 de novembro de 2026 · domingo</span><br>
+    <span class="tema">Amor x Preconceito</span>
+    <div class="expositor">Expositor<strong>Artur Valadares</strong></div>
+  </header>
+
+  <div class="container estreito" style="padding-top:0">
+    <form id="form" class="cartao">
+      <h2>Envie sua pergunta</h2>
+      <p class="sub">A equipe organiza as perguntas antes de levá-las ao expositor.</p>
+
+      <label for="nome">Seu nome</label>
+      <input id="nome" type="text" maxlength="80" autocomplete="name" placeholder="Opcional">
+      <label class="check"><input id="anonimo" type="checkbox"> Enviar como anônimo</label>
+
+      <label for="texto">Pergunta</label>
+      <textarea id="texto" maxlength="1000" required placeholder="Escreva aqui sua pergunta"></textarea>
+      <div class="contador"><span id="conta">0</span>/1000</div>
+
+      <button id="enviar" class="primario grande" type="submit">Enviar pergunta</button>
+      <div id="msg" class="aviso oculto"></div>
+    </form>
+
+    <p class="rodape">
+      Garça Tenis Club · Garça/SP<br>
+      Realização: <strong>USE Intermunicipal de Garça</strong> · <strong>USE Regional de Marília</strong>
+    </p>
+  </div>
+
+  <script src="/comum.js"></script>
+  <script>
+    var form = document.getElementById('form');
+    var nome = document.getElementById('nome');
+    var anonimo = document.getElementById('anonimo');
+    var texto = document.getElementById('texto');
+    var botao = document.getElementById('enviar');
+    var msg = document.getElementById('msg');
+
+    anonimo.addEventListener('change', function () {
+      nome.disabled = anonimo.checked;
+    });
+    texto.addEventListener('input', function () {
+      document.getElementById('conta').textContent = texto.value.length;
+    });
+
+    function aviso(tipo, txt) {
+      msg.className = 'aviso ' + tipo;
+      msg.textContent = txt;
+    }
+
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      botao.disabled = true;
+      botao.textContent = 'Enviando…';
+      chamar('enviarPergunta', anonimo.checked ? '' : nome.value, texto.value)
+        .then(function () {
+          texto.value = '';
+          document.getElementById('conta').textContent = '0';
+          aviso('sucesso', 'Pergunta enviada! Obrigado. Você pode enviar outra se quiser.');
+        })
+        .catch(function (e) { aviso('erro', erroMsg(e)); })
+        .then(function () {
+          botao.disabled = false;
+          botao.textContent = 'Enviar pergunta';
+        });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Telão · 44º Congresso Espírita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --navy: #0b1a3d; --navy-2: #142a5c; --ouro: #d4a94f; --ouro-claro: #f0d48c; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      background:
+        radial-gradient(ellipse 70% 55% at 50% 0%, rgba(80,120,220,.38), transparent 70%),
+        radial-gradient(ellipse 50% 40% at 100% 100%, rgba(212,169,79,.14), transparent 70%),
+        linear-gradient(180deg, var(--navy-2), var(--navy) 65%);
+      color: #fff;
+      font-family: "Montserrat", system-ui, sans-serif;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .faixa { height: 4px; background: linear-gradient(90deg, transparent, var(--ouro) 20%, var(--ouro-claro) 50%, var(--ouro) 80%, transparent); }
+    .topo {
+      display: flex; justify-content: space-between; align-items: center; gap: 24px;
+      padding: 3vh 6vw 0; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+      font-size: clamp(12px, 1.25vw, 22px); color: #c9d2ea;
+    }
+    .topo b { color: #fff; font-weight: 800; }
+    .topo .tema {
+      color: var(--navy); padding: .3em .9em;
+      background: linear-gradient(100deg, #e6c477 0%, #f6e3ad 40%, #e2bd69 75%, #c99a3f 100%);
+      clip-path: polygon(2% 8%, 12% 0, 40% 4%, 70% 0, 97% 6%, 100% 40%, 98% 92%, 70% 100%, 35% 96%, 6% 100%, 0 70%, 1% 30%);
+      font-weight: 800; letter-spacing: .04em;
+    }
+    main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 4vh 8vw; }
+    .palco { width: 100%; max-width: 1600px; text-align: center; transition: opacity .45s, transform .45s; }
+    .palco.trocando { opacity: 0; transform: translateY(12px); }
+    .rotulo {
+      display: inline-flex; align-items: center; gap: 18px;
+      font-size: clamp(13px, 1.4vw, 24px); font-weight: 700; letter-spacing: .24em; text-transform: uppercase;
+      color: var(--ouro); margin-bottom: 4.5vh;
+    }
+    .rotulo::before, .rotulo::after { content: ""; width: 4vw; height: 2px; background: var(--ouro); }
+    .pergunta {
+      font-size: clamp(28px, 4.4vw, 82px); line-height: 1.22; font-weight: 700;
+      margin: 0; white-space: pre-wrap; word-wrap: break-word;
+      text-shadow: 0 4px 30px rgba(0,0,0,.35);
+    }
+    .pergunta.longa { font-size: clamp(24px, 3.3vw, 60px); }
+    .pergunta.muito-longa { font-size: clamp(20px, 2.4vw, 44px); }
+    .autor {
+      display: inline-block; margin-top: 5.5vh; font-size: clamp(18px, 2vw, 38px); font-weight: 700;
+      color: var(--ouro-claro); letter-spacing: .03em;
+    }
+    .autor::before { content: "— "; color: var(--ouro); }
+    .espera .pergunta { font-weight: 800; }
+    .link {
+      display: inline-block; margin-top: 4vh; font-size: clamp(13px, 1.3vw, 24px); font-weight: 600;
+      color: #c9d2ea; word-break: break-all; padding: .6em 1.2em; border: 1.5px solid rgba(212,169,79,.5); border-radius: 99px;
+    }
+    .rodape {
+      text-align: center; padding: 0 6vw 3vh; font-size: clamp(11px, 1vw, 18px); color: #93a0c4; letter-spacing: .06em;
+    }
+    .rodape b { color: #c9d2ea; }
+  </style>
+</head>
+<body>
+  <div class="faixa"></div>
+  <div class="topo">
+    <span><b>44º Congresso Espírita</b> · Região de Marília</span>
+    <span class="tema">Amor x Preconceito</span>
+  </div>
+
+  <main>
+    <div id="palco" class="palco espera">
+      <div class="rotulo">Pergunta do público</div>
+      <p id="pergunta" class="pergunta">Envie sua pergunta pelo celular</p>
+      <div id="autor" class="autor" style="display:none"></div>
+      <div id="link" class="link"></div>
+    </div>
+  </main>
+
+  <div class="rodape">Expositor <b>Artur Valadares</b> · Apresentação musical <b>Plinio Oliveira</b></div>
+
+  <script src="/comum.js"></script>
+  <script>
+    var atualId = null;
+    var palco = document.getElementById('palco');
+    var elPergunta = document.getElementById('pergunta');
+    var elAutor = document.getElementById('autor');
+    var elLink = document.getElementById('link');
+    elLink.textContent = location.host;
+
+    function mostrar(q) {
+      var novoId = q ? q.id + '|' + q.texto + '|' + q.nome : '';
+      if (novoId === atualId) return;
+      atualId = novoId;
+      palco.classList.add('trocando');
+      setTimeout(function () {
+        if (q) {
+          palco.classList.remove('espera');
+          elPergunta.textContent = q.texto;
+          elPergunta.className = 'pergunta' + (q.texto.length > 380 ? ' muito-longa' : q.texto.length > 180 ? ' longa' : '');
+          elAutor.textContent = q.nome;
+          elAutor.style.display = '';
+          elLink.style.display = 'none';
+        } else {
+          palco.classList.add('espera');
+          elPergunta.textContent = 'Envie sua pergunta pelo celular';
+          elPergunta.className = 'pergunta';
+          elAutor.style.display = 'none';
+          elLink.style.display = '';
+        }
+        palco.classList.remove('trocando');
+      }, 450);
+    }
+
+    repetir(function () { return chamar('dadosTelao').then(mostrar); }, 3000);
+  </script>
+</body>
+</html>
