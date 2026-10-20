@@ -12,8 +12,18 @@
 
 const crypto = require('crypto');
 
-const REDIS_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-const REDIS_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+// O Vercel pode criar as variáveis com um prefixo (ex.: STORAGE_KV_REST_API_URL), então aceitamos qualquer um.
+function variavel(...finais) {
+  for (const final of finais) {
+    if (process.env[final]) return process.env[final];
+    const nome = Object.keys(process.env).find((k) => k.endsWith('_' + final) && process.env[k]);
+    if (nome) return process.env[nome];
+  }
+  return '';
+}
+
+const REDIS_URL = variavel('KV_REST_API_URL', 'UPSTASH_REDIS_REST_URL');
+const REDIS_TOKEN = variavel('KV_REST_API_TOKEN', 'UPSTASH_REDIS_REST_TOKEN');
 
 const CHAVE_PERGUNTAS = 'congresso:perguntas'; // hash: id -> JSON da pergunta
 const CHAVE_TELAO = 'congresso:telao';         // id da pergunta no telão
@@ -162,7 +172,12 @@ module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   if (req.method !== 'POST') return res.status(405).json({ erro: 'Use POST.' });
   if (!REDIS_URL || !REDIS_TOKEN) {
-    return res.status(500).json({ erro: 'Banco de dados não configurado. Conecte o Upstash Redis no Vercel.' });
+    // Mostra só os NOMES das variáveis parecidas com banco, nunca os valores, para ajudar no diagnóstico.
+    const vistas = Object.keys(process.env).filter((k) => /KV|REDIS|UPSTASH|STORAGE/.test(k));
+    return res.status(500).json({
+      erro: 'Banco de dados não configurado. Conecte o Upstash Redis no Vercel e faça Redeploy. ' +
+        (vistas.length ? 'Variáveis encontradas: ' + vistas.join(', ') : 'Nenhuma variável de banco encontrada.'),
+    });
   }
 
   let corpo = req.body || {};
