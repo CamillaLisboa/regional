@@ -71,9 +71,21 @@ async function telaoId() {
   return (await redis('GET', CHAVE_TELAO)) || '';
 }
 
+// Aceita o nome com maiúsculas/minúsculas ou espaços diferentes (ex.: "pin_equipe ").
+function pinEquipe() {
+  const nome = Object.keys(process.env).find((k) => k.trim().toUpperCase() === 'PIN_EQUIPE');
+  return nome ? String(process.env[nome]).trim() : '';
+}
+
 function exigirPin(pin) {
-  if (!process.env.PIN_EQUIPE) throw new ErroUsuario('PIN_EQUIPE não configurado no Vercel.');
-  if (String(pin) !== process.env.PIN_EQUIPE) throw new ErroUsuario('PIN inválido.');
+  const certo = pinEquipe();
+  if (!certo) {
+    // Mostra só os NOMES de variáveis parecidas, para achar erro de digitação.
+    const parecidas = Object.keys(process.env).filter((k) => /PIN|EQUIPE/i.test(k));
+    throw new ErroUsuario('PIN_EQUIPE não configurado no Vercel.' +
+      (parecidas.length ? ' Variáveis parecidas: ' + parecidas.join(', ') : ''));
+  }
+  if (String(pin).trim() !== certo) throw new ErroUsuario('PIN inválido.');
 }
 
 function textoValido(texto, rotulo) {
@@ -116,6 +128,7 @@ const ACOES = {
 
   // Equipe
   async checarPin([pin]) {
+    if (!pinEquipe()) exigirPin(pin); // erro explicando que falta configurar
     try { exigirPin(pin); return true; } catch (e) { return false; }
   },
 

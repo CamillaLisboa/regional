@@ -55,6 +55,10 @@ function portaPin(aoEntrar) {
       porta.classList.add('oculto');
       document.getElementById('app').classList.remove('oculto');
       aoEntrar();
+    }).catch(function (e) {
+      erro.textContent = erroMsg(e);
+      erro.classList.remove('oculto');
+      porta.classList.remove('oculto');
     });
   }
 
