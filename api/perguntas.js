@@ -97,7 +97,14 @@ function textoValido(texto, rotulo) {
 
 // ---------- Ações ----------
 
+const VERSAO = '2026-10-21a';
+
 const ACOES = {
+  // Diagnóstico: diz só se está configurado, nunca os valores.
+  async status() {
+    return { versao: VERSAO, banco: Boolean(REDIS_URL && REDIS_TOKEN), pin: Boolean(pinEquipe()) };
+  },
+
   // Público
   async enviarPergunta([nome, texto], req) {
     texto = textoValido(texto, 'Escreva sua pergunta.');
